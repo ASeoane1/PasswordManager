@@ -45,20 +45,23 @@ class LogoutFragment : Fragment() {
             subtitle.text = "Login to start"
 
             val menu = navView?.menu
-            val menuItem = menu?.findItem(R.id.nav_login)
+            val itemLogin = menu?.findItem(R.id.nav_login)
+            val itemRegister = menu?.findItem(R.id.nav_register)
             val itemLogout = menu?.findItem(R.id.nav_logout)
 
             itemLogout?.isVisible = false
+            itemRegister?.isVisible = true
 
             val homeViewModel = ViewModelProvider(requireActivity()).get(HomeViewModel::class.java)
             homeViewModel.updateToken("token")
             homeViewModel.updateUserId("userId")
 
-            menuItem?.setTitle("Login")
+            itemLogin?.setTitle("Login")
+            itemLogin?.setEnabled(true)
 
             Toast.makeText(requireContext(), "Logout successful", Toast.LENGTH_SHORT).show()
 
-            findNavController().navigate(R.id.nav_home)
+            findNavController().navigate(R.id.nav_login)
         }
         return view
     }

@@ -41,6 +41,29 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_home)
+                    true
+                }
+                R.id.nav_login -> {
+                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_login)
+                    true
+                }
+                R.id.nav_register -> {
+                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_register)
+                    true
+                }
+                R.id.nav_logout -> {
+                    findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_logout)
+                    true
+                }
+                else -> false
+            }
+        }
+
+
     }
 
 

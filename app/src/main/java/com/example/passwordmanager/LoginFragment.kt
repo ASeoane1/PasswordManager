@@ -20,7 +20,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.nio.charset.Charset
 import androidx.navigation.fragment.findNavController
-
+import com.android.volley.DefaultRetryPolicy
 
 
 class LoginFragment : Fragment() {
@@ -37,6 +37,7 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
         val buttonLogin = view.findViewById<Button>(R.id.buttonLogin)
+        val buttonRegister = view.findViewById<Button>(R.id.buttonRegister)
         val textEmail = view.findViewById<EditText>(R.id.textEmailAddress)
         val textPassword = view.findViewById<EditText>(R.id.textPassword)
 
@@ -52,7 +53,8 @@ class LoginFragment : Fragment() {
 
             val requestBody = jsonObject.toString()
 
-            val apiUrl = "https://proyecto-cumn-back-66f34t4snq-no.a.run.app/auth/authenticate"
+            //val apiUrl = "https://proyecto-cumn-back-66f34t4snq-no.a.run.app/auth/authenticate"
+            val apiUrl = "http://100.83.62.114:8080/auth/authenticate"
             val requestQueue = Volley.newRequestQueue(requireContext())
 
             val stringRequest = object : StringRequest(
@@ -82,10 +84,12 @@ class LoginFragment : Fragment() {
 
                         val menu = navView?.menu
                         val itemLogin = menu?.findItem(R.id.nav_login)
+                        val itemRegister = menu?.findItem(R.id.nav_register)
                         val itemLogout = menu?.findItem(R.id.nav_logout)
 
                         itemLogin?.setTitle("Switch Account")
                         itemLogout?.isVisible = true
+                        itemRegister?.isVisible = false
 
 
 
@@ -119,10 +123,16 @@ class LoginFragment : Fragment() {
                 }
             }
 
+            //Configure timeout
+            val timeout = 20000;
+            stringRequest.setRetryPolicy(DefaultRetryPolicy(timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
             // Queue request
             requestQueue.add(stringRequest)
         }
 
+        buttonRegister.setOnClickListener {
+            findNavController().navigate(R.id.nav_register)
+        }
 
         return view
     }

@@ -9,9 +9,11 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_login">Login</string>
+    <string name="menu_register">Register</string>
     <string name="menu_logout">Logout</string>
 
     <string name="login_text">Login with email and password</string>
+    <string name="register_text">Create an account with email and password</string>
     <string name="logout_text">Logout of your account by using this button</string>
     <string name="email_placeholder">Email</string>
     <string name="password_placeholder">Password</string>
