@@ -12,16 +12,14 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.example.passwordmanager.AuthRequest
+import com.example.passwordmanager.AuthResponse
+import com.example.passwordmanager.ApiService
 import com.google.android.material.navigation.NavigationView
-import org.json.JSONException
-import org.json.JSONObject
-import java.nio.charset.Charset
 import androidx.navigation.fragment.findNavController
-import com.android.volley.DefaultRetryPolicy
-
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginFragment : Fragment() {
 
@@ -42,92 +40,67 @@ class LoginFragment : Fragment() {
         val textPassword = view.findViewById<EditText>(R.id.textPassword)
 
         buttonLogin.setOnClickListener {
-            // Obtain text field values
+            // Obtener valores de los campos de texto
             val email = textEmail.text.toString()
             val password = textPassword.text.toString()
 
-            // Generate payload
-            val jsonObject = JSONObject()
-            jsonObject.put("email", email)
-            jsonObject.put("password", password)
+            // Generar payload
+            val requestBody = AuthRequest(email = email, password = password)
 
-            val requestBody = jsonObject.toString()
+            RetrofitClient.getApiService().authenticate(requestBody).enqueue(object : Callback<AuthResponse> {
+                override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
+                    if (response.isSuccessful) {
+                        val authResponse = response.body()
+                        if (authResponse != null) {
+                            val token = authResponse.token
+                            val userId = authResponse.user_id
 
-            //val apiUrl = "https://proyecto-cumn-back-66f34t4snq-no.a.run.app/auth/authenticate"
-            val apiUrl = "http://100.83.62.114:8080/auth/authenticate"
-            val requestQueue = Volley.newRequestQueue(requireContext())
+                            // Crear shared preference para datos de login
+                            val userDataPreference = requireContext().getSharedPreferences("userData", Context.MODE_PRIVATE)
+                            with(userDataPreference.edit()) {
+                                putString("token", token)
+                                putString("userId", userId)
+                                apply()
+                            }
 
-            val stringRequest = object : StringRequest(
-                Method.POST, apiUrl,
-                Response.Listener<String> { response ->
-                    try {
-                        val jsonResponse = JSONObject(response)
-                        val token = jsonResponse.getString("token")
-                        val userId = jsonResponse.getString("user_id")
+                            // Modificar Drawer
+                            val navView = requireActivity().findViewById<NavigationView>(R.id.nav_view)
+                            val headerView = navView.getHeaderView(0)
+                            val subtitle = headerView.findViewById<TextView>(R.id.textEmail)
+                            subtitle.text = email
 
-                        //Create shared preference for login data
-                        val userDataPreference = requireContext().getSharedPreferences("userData", Context.MODE_PRIVATE)
-                        with(userDataPreference.edit()) {
-                            putString("token", token)
-                            putString("userId", userId)
-                            apply()
+                            val menu = navView.menu
+                            val itemLogin = menu.findItem(R.id.nav_login)
+                            val itemRegister = menu.findItem(R.id.nav_register)
+                            val itemLogout = menu.findItem(R.id.nav_logout)
+
+                            itemLogin.setTitle("Switch Account")
+                            itemLogout.isVisible = true
+                            itemRegister.isVisible = false
+
+                            val homeViewModel = ViewModelProvider(requireActivity()).get(HomeViewModel::class.java)
+                            homeViewModel.updateToken(token)
+                            homeViewModel.updateUserId(userId)
+
+                            Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show()
+
+                            textEmail.setText("")
+                            textPassword.setText("")
+
+                            findNavController().navigate(R.id.nav_home)
+                        } else {
+                            Toast.makeText(requireContext(), "Error en la respuesta de la API", Toast.LENGTH_SHORT).show()
                         }
-
-
-
-                        //Modify Drawer
-                        val navView = requireActivity().findViewById<NavigationView>(R.id.nav_view)
-
-                        val headerView = navView.getHeaderView(0)
-                        val subtitle = headerView.findViewById<TextView>(R.id.textEmail)
-                        subtitle.text = email
-
-                        val menu = navView?.menu
-                        val itemLogin = menu?.findItem(R.id.nav_login)
-                        val itemRegister = menu?.findItem(R.id.nav_register)
-                        val itemLogout = menu?.findItem(R.id.nav_logout)
-
-                        itemLogin?.setTitle("Switch Account")
-                        itemLogout?.isVisible = true
-                        itemRegister?.isVisible = false
-
-
-
-
-                        val homeViewModel = ViewModelProvider(requireActivity()).get(HomeViewModel::class.java)
-                        homeViewModel.updateToken(token)
-                        homeViewModel.updateUserId(userId)
-
-                        Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show()
-
-                        textEmail.setText("")
+                    } else {
+                        Toast.makeText(requireContext(), "Email o contraseña incorrectos", Toast.LENGTH_SHORT).show()
                         textPassword.setText("")
-
-                        findNavController().navigate(R.id.nav_home)
-
-
-                    } catch (e: JSONException) {
-                        Toast.makeText(requireContext(), "Error parsing response", Toast.LENGTH_SHORT).show()
                     }
-                },
-                Response.ErrorListener { error ->
-                    Toast.makeText(requireContext(), "Incorrect email or password", Toast.LENGTH_SHORT).show()
-                    textPassword.setText("")
-                }) {
-                override fun getBodyContentType(): String {
-                    return "application/json"
                 }
 
-                override fun getBody(): ByteArray {
-                    return requestBody.toByteArray(Charset.defaultCharset())
+                override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
+                    Toast.makeText(requireContext(), "Error en la llamada a la API", Toast.LENGTH_SHORT).show()
                 }
-            }
-
-            //Configure timeout
-            val timeout = 20000;
-            stringRequest.setRetryPolicy(DefaultRetryPolicy(timeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
-            // Queue request
-            requestQueue.add(stringRequest)
+            })
         }
 
         buttonRegister.setOnClickListener {
@@ -136,6 +109,4 @@ class LoginFragment : Fragment() {
 
         return view
     }
-
-
 }
