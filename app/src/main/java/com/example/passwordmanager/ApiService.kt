@@ -20,6 +20,10 @@ interface ApiService {
     fun authenticate(@Body requestBody: AuthRequest): Call<AuthResponse>
 
     @Headers("Content-Type: application/json")
+    @POST("auth/register")
+    fun register(@Body requestBody: AuthRequest): Call<RegisterResponse>
+
+    @Headers("Content-Type: application/json")
     @POST("documents/create_update_document")
     fun updateDocument(@Body requestBody: UpdateDocumentRequest): Call<String>
 
@@ -58,6 +62,10 @@ data class DocumentResponse(
 data class AuthRequest(
     val email: String,
     val password: String
+)
+
+data class RegisterResponse(
+    val message: String
 )
 
 data class AuthResponse(
