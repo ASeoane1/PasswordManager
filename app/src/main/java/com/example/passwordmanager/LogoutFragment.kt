@@ -29,7 +29,6 @@ class LogoutFragment : Fragment() {
         val buttonLogout = view.findViewById<Button>(R.id.buttonLogout)
 
         buttonLogout.setOnClickListener {
-            //Empty shared preference for login data
             val userDataPreference = requireContext().getSharedPreferences("userData", Context.MODE_PRIVATE)
             with(userDataPreference.edit()) {
                 putString("token", "")
@@ -37,7 +36,6 @@ class LogoutFragment : Fragment() {
                 apply()
             }
 
-            //Modify Drawer options
             val navView = requireActivity().findViewById<NavigationView>(R.id.nav_view)
 
             val headerView = navView.getHeaderView(0)

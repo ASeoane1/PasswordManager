@@ -50,12 +50,12 @@ class DocumentListAdapter(private val context: Context, private var data: Mutabl
                         }
                         context.startActivity(intent)
                     } else {
-                        Toast.makeText(context, "Error en la respuesta de la API", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Error in API", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<DocumentResponse>, t: Throwable) {
-                    Toast.makeText(context, "Fallo en la llamada a la API", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Failure in API response", Toast.LENGTH_SHORT).show()
                 }
             })
         }
@@ -63,7 +63,6 @@ class DocumentListAdapter(private val context: Context, private var data: Mutabl
         holder.buttonDelete.setOnClickListener {
             val position = holder.adapterPosition
             if (position != RecyclerView.NO_POSITION) {
-                // Mostrar cuadro de diálogo de confirmación
                 val builder = AlertDialog.Builder(context)
                 builder.setTitle("Confirm Delete")
                 builder.setMessage("Are you sure you want to delete this document?")

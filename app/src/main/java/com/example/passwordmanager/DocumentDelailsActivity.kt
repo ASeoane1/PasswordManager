@@ -35,7 +35,6 @@ class DocumentDetailsActivity : AppCompatActivity() {
         buttonAddRecord = findViewById(R.id.buttonAddRecord)
         buttonSave = findViewById(R.id.buttonSave)
 
-        // Obtener datos del Intent
         documentName = intent.getStringExtra("document_name") ?: run {
             Toast.makeText(this, "Missing document_name", Toast.LENGTH_SHORT).show()
             finish()
@@ -157,7 +156,6 @@ class DocumentDetailsActivity : AppCompatActivity() {
             }
         }
 
-        // Llamada a la API para actualizar el documento
         val requestBody = UpdateDocumentRequest(user = user, document_name = documentName, data = documentMap)
         RetrofitClient.getApiServiceWithToken(token).updateDocument(requestBody).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {

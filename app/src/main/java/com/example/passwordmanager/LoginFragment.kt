@@ -31,7 +31,6 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
         val buttonLogin = view.findViewById<Button>(R.id.buttonLogin)
@@ -40,11 +39,9 @@ class LoginFragment : Fragment() {
         val textPassword = view.findViewById<EditText>(R.id.textPassword)
 
         buttonLogin.setOnClickListener {
-            // Obtener valores de los campos de texto
             val email = textEmail.text.toString()
             val password = textPassword.text.toString()
 
-            // Generar payload
             val requestBody = AuthRequest(email = email, password = password)
 
             RetrofitClient.getApiService().authenticate(requestBody).enqueue(object : Callback<AuthResponse> {
@@ -63,7 +60,6 @@ class LoginFragment : Fragment() {
                                 apply()
                             }
 
-                            // Modificar Drawer
                             val navView = requireActivity().findViewById<NavigationView>(R.id.nav_view)
                             val headerView = navView.getHeaderView(0)
                             val subtitle = headerView.findViewById<TextView>(R.id.textEmail)
