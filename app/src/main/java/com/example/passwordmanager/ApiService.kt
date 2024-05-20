@@ -2,6 +2,7 @@ package com.example.passwordmanager
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
@@ -17,6 +18,18 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("auth/authenticate")
     fun authenticate(@Body requestBody: AuthRequest): Call<AuthResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("documents/create_update_document")
+    fun updateDocument(@Body requestBody: UpdateDocumentRequest): Call<String>
+
+    @Headers("Content-Type: application/json")
+    @POST("documents/delete_user_document")
+    fun deleteDocument(@Body requestBody: DocumentRequest): Call<String>
+
+    @Headers("Content-Type: application/json")
+    @POST("documents/add_user_document")
+    fun addDocument(@Body requestBody: DocumentRequest): Call<String>
 }
 
 data class UserDocumentsRequest(
@@ -26,6 +39,12 @@ data class UserDocumentsRequest(
 data class DocumentRequest(
     val user: String,
     val document_name: String
+)
+
+data class UpdateDocumentRequest(
+    val user: String,
+    val document_name: String,
+    val data: Map<String, String>
 )
 
 data class UserDocumentsResponse(
